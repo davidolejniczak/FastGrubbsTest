@@ -1,0 +1,32 @@
+[build-system]
+requires = [
+    "setuptools>=59.6.0",
+    "wheel",
+    "pybind11>=2.6.0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "IterativeJackKnife"
+version = "0.0.1"
+authors = [
+  { name="David Olejniczak", email="david.olejniczak@icloud.com" },
+]
+description = "JackKnife Iterative technique used to calculate Z scores"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Statistics"
+]
+dependencies = [
+    "pybind11>=2.6.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/davidolejniczak/IterativeJackKnife"
+Issues = "https://github.com/davidolejniczak/IterativeJackKnife/issues"

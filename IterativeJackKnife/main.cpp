@@ -8,209 +8,277 @@
 #include <stddef.h>
 #include <map>
 #include <algorithm>
+#include <tuple>
 
-using namespace std; 
 namespace py = pybind11;
 
-/**
- * @brief Configuration class for the JackKnife algorithm
- * 
- * This class provides an interface to configure and run the iterative jackknife
- * algorithm with customizable parameters. It maintains the percentile and degrees
- * of freedom settings and provides methods to modify them.
- */
-class JackKnifeConfig {
-private:
-    double percentile; 
-    double dof1;      
+
+class BaseConfig {
+protected:
     bool useListOutput;
-    bool warningFlag;
+    bool useIdField;
 
 public:
-    /**
-     * @brief Constructor initializing default parameters
-     */
-    JackKnifeConfig() : percentile(0.95), dof1(3.0), useListOutput(true), warningFlag(true) {}
-    
-    /**
-     * @brief Get current percentile value
-     * @return Current percentile setting
-     */
-    double getPercentile() const { return percentile; }
+    BaseConfig() : useListOutput(true), useIdField(false) {}
 
-    /**
-     * @brief Get current degrees of freedom parameter
-     * @return Current dof1 setting
-     */
-    double getDof1() const { return dof1; }
-    
-    /**
-     * @brief Get current output format setting
-     * @return True if using list output format, false if using dictionary
-     */
     bool getUseListOutput() const { return useListOutput; }
-    
-    /**
-     * @brief Set new percentile value
-     * @param p New percentile value (must be between 0 and 1)
-     * @throws ValueError if p is not between 0 and 1
-     */
-    void setPercentile(double p) {
-        if (p < 0.0 || p > 1.0) {
-            PyErr_SetString(PyExc_ValueError, "Percentile must be between 0 and 1");
-            return;
-        }
-        percentile = p;
-    }
-    
-    /**
-     * @brief Set new degrees of freedom parameter
-     * @param d New dof1 value (must be greater than 0)
-     * @throws ValueError if d is not positive
-     */
-    void setDof1(double d) {
-        if (d <= 0.0) {
-            PyErr_SetString(PyExc_ValueError, "Degrees of freedom must be greater than 0");
-            return;
-        }
-        dof1 = d;
-    }
-    
-    /**
-     * @brief Set the output format to use (list or dictionary)
-     * @param useList True to use list output format, false to use dictionary
-     */
     void setUseListOutput(bool useList) {
         useListOutput = useList;
     }
 
-    /**
-     * @brief Set warnings on or off 
-     * @param flag True activates warnings, false turns them off
-     */
-    void setwarningFlag(bool flag) {
-        warningFlag = flag;
+    bool getUseIdField() const { return useIdField; }
+    void setUseIdField(bool useId) {
+        useIdField = useId;
     }
-    
-    /**
-     * @brief Generate z-scores using the iterative jackknife algorithm
-     * 
-     * @param dataList List containing input values
-     * @return Dictionary mapping input values to their z-scores
-     * @throws MemoryError if unable to allocate required memory
-     */
-    py::object runJackknife(const py::list& dataList) const {
-        vector<double> dataValues;
-        
-        for (auto item : dataList) {
-            double value = item.cast<double>();
-            dataValues.push_back(value);
+
+    bool processInput(const py::object& input,
+                      std::vector<py::object>& ids,
+                      std::vector<double>& values) const {
+        try {
+            if (py::isinstance<py::list>(input)) {
+                py::list listInput = input.cast<py::list>();
+
+                for (auto item : listInput) {
+                    if (py::isinstance<py::list>(item) || py::isinstance<py::tuple>(item)) {
+                        auto insideList = item.cast<py::list>();
+                        std::size_t len = insideList.size();
+
+                        if (len >= 2 && useIdField) {
+                            ids.push_back(insideList[0]);
+                            values.push_back(insideList[1].cast<double>());
+                        } else if (len >= 1) {
+                            if (useIdField) {
+                                ids.push_back(py::int_(ids.size()));
+                            }
+                            values.push_back(insideList[0].cast<double>());
+                        }
+                    } else {
+                        if (useIdField) {
+                            ids.push_back(py::int_(ids.size()));
+                        }
+                        values.push_back(item.cast<double>());
+                    }
+                }
+            }
+            else if (py::isinstance<py::dict>(input)) {
+                py::dict dictInput = input.cast<py::dict>();
+
+                for (auto item : dictInput) {
+                    py::handle keyVar = item.first;
+                    py::handle valueVar = item.second;
+
+                    py::object key = py::reinterpret_borrow<py::object>(keyVar);
+                    py::object value = py::reinterpret_borrow<py::object>(valueVar);
+
+                    ids.push_back(key);
+
+                    if (py::isinstance<py::tuple>(value) || py::isinstance<py::list>(value)) {
+                        auto tuple_or_list = value.cast<py::tuple>();
+                        if (tuple_or_list.size() >= 1) {
+                            values.push_back(tuple_or_list[0].cast<double>());
+                        }
+                    } else {
+                        values.push_back(value.cast<double>());
+                    }
+                }
+            }
+            return true;
+        } catch (const std::exception& e) {
+            std::cerr << "Error processing input data: " << e.what() << std::endl;
+            return false;
         }
-        
-        size_t size = dataValues.size();
+    }
+
+    py::object formatOutput(const std::vector<py::object>& ids,
+                           const std::vector<double>& values,
+                           const std::vector<double>& zscores) const {
+        std::size_t size = values.size();
         if (size == 0) {
             return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
         }
-        
-        double* values = (double*)malloc(size * sizeof(double));
-        double* zscores = (double*)malloc(size * sizeof(double));
-        
-        if (!values || !zscores) {
-            PyErr_SetString(PyExc_MemoryError, "Failed to allocate memory for jackknife algorithm");
-            if (values) free(values);
-            if (zscores) free(zscores);
-            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
-        }
-        
-        for (size_t i = 0; i < size; i++) {
-            values[i] = dataValues[i];
-        }
-        
-        double* finalValues = nullptr;
-        size_t finalSize = 0;
-        int status = performIterativeJackknife(values, size, &finalValues, &finalSize, zscores, percentile, dof1);
-        
-        if (status != 0) {
-            free(values);
-            free(zscores);
-            if (finalValues) free(finalValues);
-            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
-        }
-        
+
         if (useListOutput) {
             py::list resultList;
-            for (size_t i = 0; i < size; i++) {
-                py::list pair;
-                pair.append(dataValues[i]); 
-                pair.append(zscores[i]);   
-                resultList.append(pair);
+            for (std::size_t i = 0; i < size; i++) {
+                py::list item;
+                if (useIdField) {
+                    item.append(ids[i]);
+                }
+                item.append(values[i]);
+                item.append(zscores[i]);
+                resultList.append(item);
             }
-            
-            free(values);
-            free(zscores);
-            if (finalValues) free(finalValues);
             return resultList;
         } else {
-            // Create a dictionary mapping values to z-scores (original behavior)
             py::dict resultDict;
-            for (size_t i = 0; i < size; i++) {
-                resultDict[py::cast(dataValues[i])] = py::cast(zscores[i]);
+            for (std::size_t i = 0; i < size; i++) {
+                py::tuple valueZscore = py::make_tuple(values[i], zscores[i]);
+                resultDict[ids[i]] = valueZscore;
             }
-            
-            free(values);
-            free(zscores);
-            if (finalValues) free(finalValues);
             return resultDict;
         }
     }
-    
-    /**
-     * @brief Process data using the iterative jackknife algorithm with dict input
-     * Overloading dict input.
-     * 
-     * @param dataDict Dictionary containing input values
-     * @return Dictionary mapping input values to their z-scores
-     */
-    py::object runJackknife(const py::dict& dataDict) const {
-        if (!useListOutput && warningFlag) {
-            PyErr_WarnEx(PyExc_Warning, 
-                "Using dictionary input/output format may lose duplicate values. "
-                "Consider using list input with setUseListOutput(True) for handling duplicates.", 
-                1);
+};
+
+
+class JackKnifeConfig : public BaseConfig {
+private:
+    double percentile;
+    double dof1;
+
+public:
+    JackKnifeConfig() : BaseConfig(), percentile(0.95), dof1(3.0) {}
+
+    double getPercentile() const { return percentile; }
+    void setPercentile(double p) {
+        if (p < 0.0 || p > 1.0) {
+            std::cerr << "Error: Percentile must be between 0 and 1" << std::endl;
+            return;
         }
-        
-        py::list dataList;
-            for (auto item : dataDict) {
-                item.first.cast<double>();
-                dataList.append(item.first);
+        percentile = p;
+    }
+
+    double getDof1() const { return dof1; }
+    void setDof1(double d) {
+        if (d <= 0.0) {
+            std::cerr << "Error: Dof1 must be greater than 0"<< std::endl;
+            return;
+        }
+        dof1 = d;
+    }
+
+    py::object runJackknife(const py::object& input) const {
+        std::vector<py::object> ids;
+        std::vector<double> values;
+
+        if (!processInput(input, ids, values)) {
+            return py::none();
+        }
+
+        if (values.empty()) {
+            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
+        }
+
+        if (!useIdField) {
+            ids.clear();
+            for (std::size_t i = 0; i < values.size(); i++) {
+                ids.push_back(py::int_(i));
             }
-        return runJackknife(dataList);
+        }
+
+        std::size_t size = values.size();
+        double* valuesArray = (double*)std::malloc(size * sizeof(double));
+        double* zscores = (double*)std::malloc(size * sizeof(double));
+
+        if (!valuesArray || !zscores) {
+            std::cerr << "Error: Failed to allocate memory for jackknife" << std::endl;
+            if (valuesArray) std::free(valuesArray);
+            if (zscores) std::free(zscores);
+            return py::none();
+        }
+
+        for (std::size_t i = 0; i < size; i++) {
+            valuesArray[i] = values[i];
+        }
+
+        double* finalValues = nullptr;
+        std::size_t finalSize = 0;
+        int status = performIterativeJackknife(valuesArray, size, &finalValues, &finalSize, zscores, percentile, dof1);
+
+        if (status != 0) {
+            std::free(valuesArray);
+            std::free(zscores);
+            if (finalValues) std::free(finalValues);
+            return py::none();
+        }
+
+        std::vector<double> zscoreVector(zscores, zscores + size);
+        py::object result = formatOutput(ids, values, zscoreVector);
+
+        std::free(valuesArray);
+        std::free(zscores);
+        if (finalValues) std::free(finalValues);
+
+        return result;
     }
 };
 
-/**
- * @brief Wrapper function for calcFisher with default parameters
- */
-double calcFisher_wrapper(size_t vectorSize, double percentile = 0.95, double dof1 = 3.0) {
-    return calcFisher(percentile, dof1, vectorSize);
-}
+
+class NoOutlierConfig : public BaseConfig {
+public:
+    NoOutlierConfig() : BaseConfig() {}
+    py::object runNoOutlier(const py::object& input) const {
+        std::vector<py::object> ids;
+        std::vector<double> values;
+
+        if (!processInput(input, ids, values)) {
+            return py::none();
+        }
+
+        if (values.empty()) {
+            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
+        }
+
+        if (!useIdField) {
+            ids.clear();
+            for (std::size_t i = 0; i < values.size(); i++) {
+                ids.push_back(py::int_(i));
+            }
+        }
+
+        std::size_t size = values.size();
+        double* valuesArray = (double*)std::malloc(size * sizeof(double));
+        double* zscores = (double*)std::malloc(size * sizeof(double));
+
+        if (!valuesArray || !zscores) {
+            std::cerr << "Error: Failed to allocate memory for noOutlier" << std::endl;
+            if (valuesArray) std::free(valuesArray);
+            if (zscores) std::free(zscores);
+            return py::none();
+        }
+
+        for (std::size_t i = 0; i < size; i++) {
+            valuesArray[i] = values[i];
+        }
+
+        int status = performNoOutlier(valuesArray, size, zscores);
+
+        if (status != 0) {
+            std::free(valuesArray);
+            std::free(zscores);
+            return py::none();
+        }
+
+        std::vector<double> zscoreVector(zscores, zscores + size);
+        py::object result = formatOutput(ids, values, zscoreVector);
+
+        std::free(valuesArray);
+        std::free(zscores);
+
+        return result;
+    }
+};
 
 PYBIND11_MODULE(main, JKI) {
-    JKI.doc() = "Iterative JackKnife module for identifying outliers in datasets using statistical methods";
+    JKI.doc() = "Iterative JackKnife module for identifying outliers and providing zscores.";
 
-    JKI.def("zScore", &zScore,"Calculate z-score for a value.\n\n");
-    JKI.def("calcFisher", &calcFisher, "Calculate F-distribution value with full parameter control.");
-    JKI.def("calcFisher", &calcFisher_wrapper, py::arg("vectorSize"), py::arg("percentile") = 0.95, py::arg("dof1") = 3.0,
-            "Calculate F-distribution value with default parameters.\n\n");
+    py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig Class")
+        .def(py::init<>())
+        .def_property("Percentile", &JackKnifeConfig::getPercentile,&JackKnifeConfig::setPercentile, "Percentile setting")
+        .def_property("Dof1", &JackKnifeConfig::getDof1,&JackKnifeConfig::setDof1,"Dof1 value")
 
-    py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig","Configuration class for the iterative jackknife algorithm.\n\n")
-        .def(py::init<>(), "Create new JackKnifeConfig with default parameters")
-        .def("getPercentile", &JackKnifeConfig::getPercentile,"Get current percentile setting")
-        .def("getDof1", &JackKnifeConfig::getDof1,"Get current degrees of freedom setting")
-        .def("getUseListOutput", &JackKnifeConfig::getUseListOutput,"Get current output format setting (True for list, False for dict)")
-        .def("setPercentile", &JackKnifeConfig::setPercentile, "Set new percentile value (must be between 0 and 1)")
-        .def("setDof1", &JackKnifeConfig::setDof1,  "Set new degrees of freedom parameter (must be positive)")
-        .def("setUseListOutput", &JackKnifeConfig::setUseListOutput, "Set output format (True for list of [data, zscore] pairs, False for dict)")
-        .def("runJackknife", py::overload_cast<const py::dict&>(&JackKnifeConfig::runJackknife, py::const_),"Process data using dictionary input. Returns either dict or list based on settings.")
-        .def("runJackknife", py::overload_cast<const py::list&>(&JackKnifeConfig::runJackknife, py::const_),"Process data using list input. Returns either dict or list based on settings.");
+        .def("getUseListOutput", &JackKnifeConfig::getUseListOutput,"Returns True for list, False for dict")
+        .def("getUseIdField", &JackKnifeConfig::getUseIdField,"Returns True for ID, False for no ID")
+        .def("setUseListOutput", &JackKnifeConfig::setUseListOutput, "Set True for list, False for dict")
+        .def("setUseIdField", &JackKnifeConfig::setUseIdField, "Set True for ID, False for no ID")
+        .def("runJackknife", &JackKnifeConfig::run_Jackknife, "Return standardised deviate of each data point using Iterative JackKnife", 
+            py::arg("Dof1") = 3, py::arg("Percentile") = 0.95);
+
+    py::class_<NoOutlierConfig>(JKI, "NoOutlierConfig Class")
+        .def(py::init<>())
+        .def("getUseListOutput", &NoOutlierConfig::getUseListOutput,"Returns True for list, False for dict")
+        .def("getUseIdField", &NoOutlierConfig::getUseIdField,"Returns True for ID, False for no ID")
+        .def("setUseListOutput", &NoOutlierConfig::setUseListOutput, "Set True for list, False for dict")
+        .def("setUseIdField", &NoOutlierConfig::setUseIdField, "Set True for ID, False for no ID")
+        .def("runNoOutlier", &NoOutlierConfig::run_NoOutlier, "Returns standardised deviate of each data point");
 }
