@@ -258,7 +258,7 @@ public:
 PYBIND11_MODULE(main, JKI) {
     JKI.doc() = "Iterative JackKnife module for identifying outliers and calculating zscores.";
 
-    py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig Class")
+    py::class_<JackKnifeConfig>(JKI, "JackKnife")
         .def(py::init<>())
         .def_property("Percentile", &JackKnifeConfig::getPercentile,&JackKnifeConfig::setPercentile, "Percentile setting")
         .def_property("Dof1", &JackKnifeConfig::getDof1,&JackKnifeConfig::setDof1,"Dof1 value")
@@ -266,7 +266,7 @@ PYBIND11_MODULE(main, JKI) {
         .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")
         .def("runJackknife", &JackKnifeConfig::runJackknife, "Return standardised deviate of each data point using Iterative JackKnife");
 
-    py::class_<NoOutlierConfig>(JKI, "NoOutlierConfig Class")
+    py::class_<NoOutlierConfig>(JKI, "NoOutlier")
         .def(py::init<>())
         .def_property("UseListOutput", &JackKnifeConfig::getUseListOutput,&JackKnifeConfig::setUseListOutput,"Use List Output, True for list, False for dict")
         .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")

@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-
 from IterativeJackKnife import run_JackKnife
 
 def list_examples():
@@ -8,5 +6,6 @@ def list_examples():
     
     results = run_JackKnife(data,dof1=3.0,percentile=0.95,use_list_output=True,use_id_field=False)
     print(results)
+    
 if __name__ == "__main__":
         list_examples()
