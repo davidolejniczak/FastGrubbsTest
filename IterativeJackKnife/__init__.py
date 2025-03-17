@@ -4,7 +4,7 @@ __version__ = "0.0.1"
 
 class JackKnife:
     def __init__(self, percentile=0.95, dof1=3.0, use_list_output=True, use_id_field=False):
-        self._config = JackKnife()
+        self._config = JackKnifeConfig()
         self.percentile = percentile
         self.dof1 = dof1
         self.use_list_output = use_list_output
@@ -48,7 +48,7 @@ class JackKnife:
 
 class NoOutlier:
     def __init__(self, use_list_output=True, use_id_field=False):
-        self._config = NoOutlier()
+        self._config = NoOutlierConfig()
         self.use_list_output = use_list_output
         self.use_id_field = use_id_field
 
