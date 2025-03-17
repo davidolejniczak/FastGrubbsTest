@@ -3,12 +3,12 @@ from .main import JackKnifeConfig, NoOutlierConfig
 __version__ = "0.0.1"
 
 class JackKnife:
-    def __init__(self, percentile=0.95, dof1=3.0, use_list_output=True, use_id_field=False):
+    def __init__(self, percentile=0.95, dof1=3.0, useList=True, useID=False):
         self._config = JackKnifeConfig()
         self.percentile = percentile
         self.dof1 = dof1
-        self.use_list_output = use_list_output
-        self.use_id_field = use_id_field
+        self.useList = useList
+        self.useID = useID
 
     @property
     def percentile(self):
@@ -16,57 +16,57 @@ class JackKnife:
 
     @percentile.setter
     def percentile(self, value):
-        self._config.setPercentile(value)
+        self._config.Percentile = value
 
     @property
     def dof1(self):
-        return self._config.getDof1()
+        return self._config.Dof1
 
     @dof1.setter
     def dof1(self, value):
-        self._config.setDof1(value)
+        self._config.Dof1 = value
 
     @property
-    def use_list_output(self):
-        return self._config.getUseListOutput()
+    def useList(self):
+        return self._config.getUseList()
 
-    @use_list_output.setter
-    def use_list_output(self, value):
-        self._config.setUseListOutput(value)
+    @useList.setter
+    def useList(self, value):
+        self._config.UseList = value
 
     @property
-    def use_id_field(self):
-        return self._config.getUseIdField()
+    def useID(self):
+        return self._config.getUseId()
 
-    @use_id_field.setter
-    def use_id_field(self, value):
-        self._config.setUseIdField(value)
+    @useID.setter
+    def useID(self, value):
+        self._config.UseId = value
 
     def run(self, data):
         return self._config.runJackknife(data)
 
 
 class NoOutlier:
-    def __init__(self, use_list_output=True, use_id_field=False):
+    def __init__(self, useList=True, useID=False):
         self._config = NoOutlierConfig()
-        self.use_list_output = use_list_output
-        self.use_id_field = use_id_field
+        self.useList = useList
+        self.useID = useID
 
     @property
-    def use_list_output(self):
-        return self._config.getUseListOutput()
+    def useList(self):
+        return self._config.getUseList()
 
-    @use_list_output.setter
-    def use_list_output(self, value):
-        self._config.setUseListOutput(value)
+    @useList.setter
+    def useList(self, value):
+        self._config.UseList = value
 
     @property
-    def use_id_field(self):
-        return self._config.getUseIdField()
+    def useID(self):
+        return self._config.getUseId()
 
-    @use_id_field.setter
-    def use_id_field(self, value):
-        self._config.setUseIdField(value)
+    @useID.setter
+    def useID(self, value):
+        self._config.UseId = value
 
     def run(self, data):
         return self._config.runNoOutlier(data)

@@ -11,20 +11,20 @@ namespace py = pybind11;
 
 class BaseConfig {
 protected:
-    bool useListOutput;
-    bool useIdField;
+    bool useList;
+    bool useId;
 
 public:
-    BaseConfig() : useListOutput(true), useIdField(false) {}
+    BaseConfig() : useList(true), useId(false) {}
 
-    bool getUseListOutput() const { return useListOutput; }
-    void setUseListOutput(bool useList) {
-        useListOutput = useList;
+    bool getUseList() const { return useList; }
+    void setUseList(bool useList) {
+        useList = useList;
     }
 
-    bool getUseIdField() const { return useIdField; }
-    void setUseIdField(bool useId) {
-        useIdField = useId;
+    bool getUseId() const { return useId; }
+    void setUseId(bool useId) {
+        useId = useId;
     }
 
     bool processInput(const py::object& input,
@@ -39,17 +39,17 @@ public:
                         auto insideList = item.cast<py::list>();
                         std::size_t len = insideList.size();
 
-                        if (len >= 2 && useIdField) {
+                        if (len >= 2 && useId) {
                             ids.push_back(insideList[0]);
                             values.push_back(insideList[1].cast<double>());
                         } else if (len >= 1) {
-                            if (useIdField) {
+                            if (useId) {
                                 ids.push_back(py::int_(ids.size()));
                             }
                             values.push_back(insideList[0].cast<double>());
                         }
                     } else {
-                        if (useIdField) {
+                        if (useId) {
                             ids.push_back(py::int_(ids.size()));
                         }
                         values.push_back(item.cast<double>());
@@ -90,14 +90,14 @@ public:
                            const std::vector<double>& zscores) const {
         std::size_t size = values.size();
         if (size == 0) {
-            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
+            return useList ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
         }
 
-        if (useListOutput) {
+        if (useList) {
             py::list resultList;
             for (std::size_t i = 0; i < size; i++) {
                 py::list item;
-                if (useIdField) {
+                if (useId) {
                     item.append(ids[i]);
                 }
                 item.append(values[i]);
@@ -152,10 +152,10 @@ public:
         }
 
         if (values.empty()) {
-            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
+            return useList ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
         }
 
-        if (!useIdField) {
+        if (!useId) {
             ids.clear();
             for (std::size_t i = 0; i < values.size(); i++) {
                 ids.push_back(py::int_(i));
@@ -212,10 +212,10 @@ public:
         }
 
         if (values.empty()) {
-            return useListOutput ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
+            return useList ? py::cast<py::object>(py::list()) : py::cast<py::object>(py::dict());
         }
 
-        if (!useIdField) {
+        if (!useId) {
             ids.clear();
             for (std::size_t i = 0; i < values.size(); i++) {
                 ids.push_back(py::int_(i));
@@ -258,17 +258,17 @@ public:
 PYBIND11_MODULE(main, JKI) {
     JKI.doc() = "Iterative JackKnife module for identifying outliers and calculating zscores.";
 
-    py::class_<JackKnifeConfig>(JKI, "JackKnife")
+    py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig")
         .def(py::init<>())
         .def_property("Percentile", &JackKnifeConfig::getPercentile,&JackKnifeConfig::setPercentile, "Percentile setting")
         .def_property("Dof1", &JackKnifeConfig::getDof1,&JackKnifeConfig::setDof1,"Dof1 value")
-        .def_property("UseListOutput", &JackKnifeConfig::getUseListOutput,&JackKnifeConfig::setUseListOutput,"Use List Output, True for list, False for dict")
-        .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")
+        .def_property("UseList", &JackKnifeConfig::getUseList,&JackKnifeConfig::setUseList,"Use List Output, True for list, False for dict")
+        .def_property("UseId", &JackKnifeConfig::getUseId,&JackKnifeConfig::setUseId,"Use ID Field, True for ID, False for no ID")
         .def("runJackknife", &JackKnifeConfig::runJackknife, "Return standardised deviate of each data point using Iterative JackKnife");
 
-    py::class_<NoOutlierConfig>(JKI, "NoOutlier")
+    py::class_<NoOutlierConfig>(JKI, "NoOutlierConfig")
         .def(py::init<>())
-        .def_property("UseListOutput", &JackKnifeConfig::getUseListOutput,&JackKnifeConfig::setUseListOutput,"Use List Output, True for list, False for dict")
-        .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")
+        .def_property("UseList", &JackKnifeConfig::getUseList,&JackKnifeConfig::setUseList,"Use List Output, True for list, False for dict")
+        .def_property("UseId", &JackKnifeConfig::getUseId,&JackKnifeConfig::setUseId,"Use ID Field, True for ID, False for no ID")
         .def("runNoOutlier", &NoOutlierConfig::runNoOutlier, "Returns standardised deviate of each data point");
 }

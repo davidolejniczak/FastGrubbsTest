@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 from IterativeJackKnife import run_JackKnife
 
 def list_examples():

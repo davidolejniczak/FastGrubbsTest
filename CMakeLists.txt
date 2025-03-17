@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.15)
-project(IterativeJackKnife VERSION 0.1.0 LANGUAGES C CXX)
+cmake_minimum_required(VERSION 3.15..3.22)
+project(IterativeJackKnife LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 11)
@@ -11,10 +11,7 @@ pkg_check_modules(GSL gsl QUIET)
 
 if(NOT GSL_FOUND)
     message(FATAL_ERROR
-        "GSL library not found! Please install it manually:\n"
-        "  Linux: sudo apt-get install libgsl-dev\n"
-        "  macOS: brew install gsl\n"
-        "  Windows (MSYS2): pacman -S mingw-w64-x86_64-gsl\n"
+        "GSL library not found\n See README.md\n"
     )
 endif()
 

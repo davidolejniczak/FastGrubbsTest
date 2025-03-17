@@ -19,7 +19,6 @@ double calcMeanStdDev(const double* arr, size_t size, double* meanResult) {
     }
     
     double mean = 0.0, M2 = 0.0;
-    
     for (size_t i = 0; i < size; i++) {
         double d1 = arr[i] - mean;
         mean += d1 / (i + 1);
@@ -43,7 +42,7 @@ double calcC(double F, size_t n, size_t dof) {
 double* calcResiduals(const double* values, double meanValue, size_t size) {
     double* residuals = (double*)malloc(size * sizeof(double));
     if (!residuals) {
-        fprintf(stderr, "Error: Failed to allocate memory for residuals\n");
+        fprintf(stderr, "Error: residuals memory failed\n");
         return NULL;
     }
     
@@ -57,7 +56,7 @@ double* calcResiduals(const double* values, double meanValue, size_t size) {
 
 int maxResidual(const double* values, double meanValue, size_t size, double* maxRes, size_t* maxIndex) {
     if (!values || size == 0 || !maxRes || !maxIndex) {
-        fprintf(stderr, "Error: Invalid parameters in maxResidual\n");
+        fprintf(stderr, "Error: maxResidual input pramas\n");
         return -1;
     }
     
