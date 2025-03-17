@@ -1,32 +1,61 @@
 [build-system]
 requires = [
-    "setuptools>=59.6.0",
+    "scikit-build-core>=0.4.3",
     "wheel",
-    "pybind11>=2.6.0"
+    "setuptools>=42",
+    "cmake>=3.18",
+    "ninja; platform_system!='Windows'",
+    "pybind11>=2.6.0",
+    "pkgconfig"
 ]
-build-backend = "setuptools.build_meta"
+build-backend = "scikit_build_core.build"
 
 [project]
 name = "IterativeJackKnife"
 version = "0.0.1"
-authors = [
-  { name="David Olejniczak", email="david.olejniczak@icloud.com" },
-]
 description = "JackKnife Iterative technique used to calculate Z scores"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.7"
+authors = [
+    {name = "David Olejniczak", email = "david.olejniczak@icloud.com"}
+]
+license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: C++",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Mathematics",
     "Topic :: Scientific/Engineering :: Statistics"
 ]
-dependencies = [
-    "pybind11>=2.6.0"
-]
+dependencies = ["pybind11>=2.6.0"]
 
 [project.urls]
 Homepage = "https://github.com/davidolejniczak/IterativeJackKnife"
-Issues = "https://github.com/davidolejniczak/IterativeJackKnife/issues"
+"Bug Tracker" = "https://github.com/davidolejniczak/IterativeJackKnife/issues"
+
+[tool.scikit-build]
+wheel.expand-macos-universal-tags = true
+cmake.build-type = "Release"
+cmake.verbose = true
+minimum-version = "0.4.0"
+install.components = ["python"]
+
+# Define our components
+sdist.include = [
+    "IterativeJackKnife/*.cpp",
+    "IterativeJackKnife/*.c",
+    "IterativeJackKnife/*.h",
+    "IterativeJackKnife/*.py",
+    "CMakeLists.txt"
+]
+sdist.exclude = ["build/*", "*.so", "*.egg-info"]
+wheel.packages = ["IterativeJackKnife"]
+
+[tool.scikit-build.cmake.define]
+USE_PYTHON_INCLUDE_DIR = "ON"

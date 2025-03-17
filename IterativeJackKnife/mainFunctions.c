@@ -1,11 +1,10 @@
 #include "mainFunctions.h"
 #include <stdio.h>
-#include <math.h> 
 #include <stddef.h>
 #include <gsl/gsl_rng.h>
 #include <gsl/gsl_cdf.h>
-#include <Python.h>
 #include <stdlib.h> 
+#include <math.h>
 #include <string.h>
 
 double calcZScore(double mean, double sd, double xUnit) {

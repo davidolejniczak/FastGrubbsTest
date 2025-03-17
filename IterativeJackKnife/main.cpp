@@ -1,14 +1,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-#include <cmath>
 #include "mainFunctions.h"
 #include <pybind11/pybind11.h> 
 #include <pybind11/stl.h>
 #include <stddef.h>
-#include <map>
-#include <algorithm>
-#include <tuple>
 
 namespace py = pybind11;
 
@@ -260,25 +256,19 @@ public:
 };
 
 PYBIND11_MODULE(main, JKI) {
-    JKI.doc() = "Iterative JackKnife module for identifying outliers and providing zscores.";
+    JKI.doc() = "Iterative JackKnife module for identifying outliers and calculating zscores.";
 
     py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig Class")
         .def(py::init<>())
         .def_property("Percentile", &JackKnifeConfig::getPercentile,&JackKnifeConfig::setPercentile, "Percentile setting")
         .def_property("Dof1", &JackKnifeConfig::getDof1,&JackKnifeConfig::setDof1,"Dof1 value")
-
-        .def("getUseListOutput", &JackKnifeConfig::getUseListOutput,"Returns True for list, False for dict")
-        .def("getUseIdField", &JackKnifeConfig::getUseIdField,"Returns True for ID, False for no ID")
-        .def("setUseListOutput", &JackKnifeConfig::setUseListOutput, "Set True for list, False for dict")
-        .def("setUseIdField", &JackKnifeConfig::setUseIdField, "Set True for ID, False for no ID")
-        .def("runJackknife", &JackKnifeConfig::run_Jackknife, "Return standardised deviate of each data point using Iterative JackKnife", 
-            py::arg("Dof1") = 3, py::arg("Percentile") = 0.95);
+        .def_property("UseListOutput", &JackKnifeConfig::getUseListOutput,&JackKnifeConfig::setUseListOutput,"Use List Output, True for list, False for dict")
+        .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")
+        .def("runJackknife", &JackKnifeConfig::runJackknife, "Return standardised deviate of each data point using Iterative JackKnife");
 
     py::class_<NoOutlierConfig>(JKI, "NoOutlierConfig Class")
         .def(py::init<>())
-        .def("getUseListOutput", &NoOutlierConfig::getUseListOutput,"Returns True for list, False for dict")
-        .def("getUseIdField", &NoOutlierConfig::getUseIdField,"Returns True for ID, False for no ID")
-        .def("setUseListOutput", &NoOutlierConfig::setUseListOutput, "Set True for list, False for dict")
-        .def("setUseIdField", &NoOutlierConfig::setUseIdField, "Set True for ID, False for no ID")
-        .def("runNoOutlier", &NoOutlierConfig::run_NoOutlier, "Returns standardised deviate of each data point");
+        .def_property("UseListOutput", &JackKnifeConfig::getUseListOutput,&JackKnifeConfig::setUseListOutput,"Use List Output, True for list, False for dict")
+        .def_property("UseIdField", &JackKnifeConfig::getUseIdField,&JackKnifeConfig::setUseIdField,"Use ID Field, True for ID, False for no ID")
+        .def("runNoOutlier", &NoOutlierConfig::runNoOutlier, "Returns standardised deviate of each data point");
 }
