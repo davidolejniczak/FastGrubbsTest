@@ -8,7 +8,6 @@
 
 namespace py = pybind11;
 
-
 class BaseConfig {
 protected:
     bool useList;
