@@ -115,34 +115,23 @@ public:
     }
 };
 
-
-class JackKnifeConfig : public BaseConfig {
+class GrubbsConfig : public BaseConfig {
 private:
-    double percentile;
-    double dof1;
+    double alpha;
 
 public:
-    JackKnifeConfig() : BaseConfig(), percentile(0.95), dof1(3.0) {}
+    GrubbsConfig() : BaseConfig(), alpha(0.05) {}
 
-    double getPercentile() const { return percentile; }
-    void setPercentile(double p) {
-        if (p < 0.0 || p > 1.0) {
-            std::cerr << "Error: Percentile must be between 0 and 1" << std::endl;
+    double getAlpha() const { return alpha; }
+    void setAlpha(double a) {
+        if (a < 0.0 || a > 1.0) {
+            std::cerr << "Error: Alpha must be between 0 and 1" << std::endl;
             return;
         }
-        percentile = p;
+        alpha = a;
     }
 
-    double getDof1() const { return dof1; }
-    void setDof1(double d) {
-        if (d <= 0.0) {
-            std::cerr << "Error: Dof1 must be greater than 0"<< std::endl;
-            return;
-        }
-        dof1 = d;
-    }
-
-    py::object runJackknife(const py::object& input) const {
+    py::object runGrubbs(const py::object& input) const {
         std::vector<py::object> ids;
         std::vector<double> values;
 
@@ -166,7 +155,7 @@ public:
         double* zscores = (double*)std::malloc(size * sizeof(double));
 
         if (!valuesArray || !zscores) {
-            std::cerr << "Error: Failed to allocate memory for jackknife" << std::endl;
+            std::cerr << "Error: Failed to allocate memory for Grubbs" << std::endl;
             if (valuesArray) std::free(valuesArray);
             if (zscores) std::free(zscores);
             return py::none();
@@ -178,7 +167,7 @@ public:
 
         double* finalValues = nullptr;
         std::size_t finalSize = 0;
-        int status = performIterativeJackknife(valuesArray, size, &finalValues, &finalSize, zscores, percentile, dof1);
+        int status = performGrubbs(valuesArray, size, &finalValues, &finalSize, zscores, alpha);
 
         if (status != 0) {
             std::free(valuesArray);
@@ -197,7 +186,6 @@ public:
         return result;
     }
 };
-
 
 class NoOutlierConfig : public BaseConfig {
 public:
@@ -254,20 +242,14 @@ public:
     }
 };
 
-PYBIND11_MODULE(main, JKI) {
-    JKI.doc() = "Iterative JackKnife module for identifying outliers and calculating zscores.";
+PYBIND11_MODULE(main, m) {
+    m.doc() = "Fast Grubbs Test.";
 
-    py::class_<JackKnifeConfig>(JKI, "JackKnifeConfig")
+    py::class_<GrubbsConfig>(m, "GrubbsConfig")
         .def(py::init<>())
-        .def_property("Percentile", &JackKnifeConfig::getPercentile,&JackKnifeConfig::setPercentile, "Percentile setting")
-        .def_property("Dof1", &JackKnifeConfig::getDof1,&JackKnifeConfig::setDof1,"Dof1 value")
-        .def_property("UseList", &JackKnifeConfig::getUseList,&JackKnifeConfig::setUseList,"Use List Output, True for list, False for dict")
-        .def_property("UseId", &JackKnifeConfig::getUseId,&JackKnifeConfig::setUseId,"Use ID Field, True for ID, False for no ID")
-        .def("runJackknife", &JackKnifeConfig::runJackknife, "Return standardised deviate of each data point using Iterative JackKnife");
+        .def("runGrubbs", &GrubbsConfig::runGrubbs, "Return standardised deviate of each data point using Grubb's test");
 
-    py::class_<NoOutlierConfig>(JKI, "NoOutlierConfig")
+    py::class_<NoOutlierConfig>(m, "NoOutlierConfig")
         .def(py::init<>())
-        .def_property("UseList", &JackKnifeConfig::getUseList,&JackKnifeConfig::setUseList,"Use List Output, True for list, False for dict")
-        .def_property("UseId", &JackKnifeConfig::getUseId,&JackKnifeConfig::setUseId,"Use ID Field, True for ID, False for no ID")
         .def("runNoOutlier", &NoOutlierConfig::runNoOutlier, "Returns standardised deviate of each data point");
 }

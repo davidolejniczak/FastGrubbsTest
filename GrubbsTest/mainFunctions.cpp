@@ -1,17 +1,22 @@
 #include "mainFunctions.h"
-#include <stdio.h>
-#include <stddef.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_cdf.h>
-#include <stdlib.h> 
-#include <math.h>
-#include <string.h>
+#include <iostream>
+#include <cstdio>
+#include <cstddef>
+#include <cstdlib>
+#include <cmath>
+#include <cstring>
+#include <memory>
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include <boost/math/distributions/students_t.hpp>
+
+namespace py = pybind11;
 
 double calcZScore(double mean, double sd, double xUnit) {
     return (xUnit - mean)/sd;  
 }
 
-//Welford's algorithm
+// Welford's algorithm
 double calcMeanStdDev(const double* arr, size_t size, double* meanResult) {
     if (size == 0) {
         if (meanResult) *meanResult = 0.0;
@@ -27,36 +32,30 @@ double calcMeanStdDev(const double* arr, size_t size, double* meanResult) {
     }
     
     if (meanResult) *meanResult = mean;
-    return (size > 1) ? sqrt(M2/size) : 0.0;
+    return (size > 1) ? std::sqrt(M2/size) : 0.0;
 }
 
-double calcFisher(double percentile, double dof1, size_t size) {
-    double fisherResult = gsl_cdf_fdist_Pinv(percentile, dof1, (double)size);
-    return fisherResult;
-}
-
-double calcC(double F, size_t n, size_t dof) {
-    return sqrt(((3.0 * F) / (1.0 + ((3.0 * F - 1.0) / (double)dof))) * ((double)dof / (double)n));
+double calcG(double T, size_t n) {
+    return ((n-1)/std::sqrt(n)) * ((T*T)/ (std::sqrt(n-2+(T*T))));
 }
 
 double* calcResiduals(const double* values, double meanValue, size_t size) {
-    double* residuals = (double*)malloc(size * sizeof(double));
+    double* residuals = (double*)std::malloc(size * sizeof(double));
     if (!residuals) {
-        fprintf(stderr, "Error: residuals memory failed\n");
-        return NULL;
+        std::cerr << "Error: residuals memory failed" << std::endl;
+        return nullptr; 
     }
     
     for (size_t i = 0; i < size; i++) {
-        residuals[i] = fabs(values[i] - meanValue);
+        residuals[i] = std::fabs(values[i] - meanValue);
     }
     
     return residuals;
 }
 
-
 int maxResidual(const double* values, double meanValue, size_t size, double* maxRes, size_t* maxIndex) {
     if (!values || size == 0 || !maxRes || !maxIndex) {
-        fprintf(stderr, "Error: maxResidual input pramas\n");
+        std::cerr << "Error: maxResidual input params" << std::endl;
         return -1;
     }
     
@@ -64,7 +63,7 @@ int maxResidual(const double* values, double meanValue, size_t size, double* max
     *maxIndex = 0;
     
     for (size_t i = 0; i < size; i++) {
-        double absResidual = fabs(values[i] - meanValue);
+        double absResidual = std::fabs(values[i] - meanValue);
         if (absResidual > *maxRes) {
             *maxRes = absResidual;
             *maxIndex = i;
@@ -74,44 +73,43 @@ int maxResidual(const double* values, double meanValue, size_t size, double* max
     return 0;
 }
 
-int performIterativeJackknife(double* values, size_t size, double** finalValues, 
-                             size_t* finalSize, double* zscores, double percentile, double dof1) {
+double calcTDist(double alpha, size_t n) {
+    auto dist = boost::math::students_t_distribution<double>(n-2);
+    return boost::math::quantile(dist, (1-(alpha/(2*n))));
+}
+
+int performGrubbs(double* values, size_t size, double** finalValues, 
+                 size_t* finalSize, double* zscores, double alpha) {
     if (size == 0 || !values || !finalValues || !finalSize || !zscores) {
-        fprintf(stderr, "Error: IterativeJackKnife input params\n");
+        std::cerr << "Error: Grubbs input params" << std::endl;
         return -1;
     }
-    
-    double* currentValues = (double*)malloc(size * sizeof(double));
+    double* currentValues = (double*)std::malloc(size * sizeof(double));
     if (!currentValues) {
-        fprintf(stderr, "Error: currentValues memory failed\n");
+        std::cerr << "Error: currentValues memory failed" << std::endl;
         return -1;
     }
     
-    memcpy(currentValues, values, size * sizeof(double));
+    std::memcpy(currentValues, values, size * sizeof(double));
     size_t currentSize = size;
-    double meanValue, stdValue, csFactor;
+    double meanValue, stdValue;
     int outlierFound = 1;
     size_t maxIndex;
     double maxRes;
         
     while (outlierFound && currentSize > 1) {
-        stdValue = calcMeanStdDev(currentValues, currentSize, &meanValue);
-        
-        size_t dof = currentSize - 1;
-        double F = calcFisher(percentile, dof1, dof);
-        double C = calcC(F, currentSize, dof);
-        csFactor = C * stdValue;
-        if (csFactor <= 2.0) {
-            csFactor = 2.0;
-        }
+
+        stdValue = calcMeanStdDev(currentValues, currentSize, &meanValue); 
+        double T = calcTDist(alpha, currentSize);
+        double GFactor = calcG(T, currentSize);
         
         if (maxResidual(currentValues, meanValue, currentSize, &maxRes, &maxIndex) != 0) {
-            free(currentValues);
+            std::free(currentValues);  
             return -1;
         }
         
-        if (maxRes > csFactor) {
-            memmove(&currentValues[maxIndex], &currentValues[maxIndex + 1], 
+        if (maxRes > GFactor) {
+            std::memmove(&currentValues[maxIndex], &currentValues[maxIndex + 1], 
                     (currentSize - maxIndex - 1) * sizeof(double));
             currentSize--;
         } else {
@@ -119,36 +117,34 @@ int performIterativeJackknife(double* values, size_t size, double** finalValues,
         }
     }
     
-    *finalValues = (double*)malloc(currentSize * sizeof(double));
+    *finalValues = (double*)std::malloc(currentSize * sizeof(double));  
     if (!*finalValues) {
-        free(currentValues);
-        fprintf(stderr, "Error: finalValues memory failed\n");
+        std::free(currentValues); 
+        std::cerr << "Error: finalValues memory failed" << std::endl;
         return -1;
     }
     
-    memcpy(*finalValues, currentValues, currentSize * sizeof(double));
+    std::memcpy(*finalValues, currentValues, currentSize * sizeof(double));
     *finalSize = currentSize;
     
     stdValue = calcMeanStdDev(*finalValues, *finalSize, &meanValue);
     for (size_t i = 0; i < size; i++) {
         zscores[i] = calcZScore(meanValue, stdValue, values[i]);
     }
-    
-    free(currentValues);
+    std::free(currentValues);
     return 0;
 }
 
 int performNoOutlier(double* values, size_t size, double* zscores) {
     if (size == 0 || !values || !zscores) {
-        fprintf(stderr, "Error: NoOutlier input params\n");
+        std::cerr << "Error: NoOutlier input params" << std::endl;
         return -1;
     }
-
     double meanValue;
     double stdValue = calcMeanStdDev(values, size, &meanValue);
     
     if (stdValue == 0.0) {
-        fprintf(stderr, "Error: Standard deviation is zero\n");
+        std::cerr << "Error: Standard deviation is zero" << std::endl;
         return -1;
     }
     

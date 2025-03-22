@@ -5,15 +5,14 @@ requires = [
     "setuptools>=42",
     "cmake>=3.18",
     "ninja",
-    "pybind11>=2.6.0",
-    "pkgconfig"
+    "pybind11>=2.13.0",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "IterativeJackKnife"
+name = "GrubbsTest"
 version = "0.0.1"
-description = "JackKnife Iterative technique used to calculate Z scores"
+description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
 requires-python = ">=3.7"
 authors = [
@@ -39,10 +38,9 @@ cmake.verbose = true
 minimum-version = "0.4.0"
 
 install.components = ["python"]
-wheel.packages = ["IterativeJackKnife"]
+wheel.packages = ["GrubbsTest"]
 
 [tool.scikit-build.cmake.define]
 USE_PYTHON_INCLUDE_DIR = "ON"
 
 CMAKE_CXX_STANDARD = "11"
-CMAKE_C_STANDARD = "11"
