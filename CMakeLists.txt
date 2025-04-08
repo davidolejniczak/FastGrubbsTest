@@ -34,6 +34,7 @@ target_include_directories(main PRIVATE
 target_link_libraries(main PRIVATE
     GrubbsTest
     ${Python3_LIBRARIES}
+    ${Boost_LIBRARIES}
 )
 
 set_target_properties(main PROPERTIES

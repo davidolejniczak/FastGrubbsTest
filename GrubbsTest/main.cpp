@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <vector>
-#include "mainFunctions.h"
+#include "mainFunctions.hpp"
 #include <pybind11/pybind11.h> 
 #include <pybind11/stl.h>
 #include <stddef.h>
@@ -17,13 +17,13 @@ public:
     BaseConfig() : useList(true), useId(false) {}
 
     bool getUseList() const { return useList; }
-    void setUseList(bool useList) {
-        useList = useList;
+    void setUseList(bool value) {
+        this->useList = value;  
     }
 
     bool getUseId() const { return useId; }
-    void setUseId(bool useId) {
-        useId = useId;
+    void setUseId(bool value) {
+        this->useId = value;
     }
 
     bool processInput(const py::object& input,
@@ -107,8 +107,12 @@ public:
         } else {
             py::dict resultDict;
             for (std::size_t i = 0; i < size; i++) {
-                py::tuple valueZscore = py::make_tuple(values[i], zscores[i]);
-                resultDict[ids[i]] = valueZscore;
+                if (useId) {
+                    py::tuple valueZscore = py::make_tuple(values[i], zscores[i]);
+                    resultDict[ids[i]] = valueZscore;
+                } else {
+                    resultDict[py::float_(values[i])] = zscores[i];
+                }
             }
             return resultDict;
         }
@@ -247,9 +251,14 @@ PYBIND11_MODULE(main, m) {
 
     py::class_<GrubbsConfig>(m, "GrubbsConfig")
         .def(py::init<>())
+        .def_property("Alpha", &GrubbsConfig::getAlpha,&GrubbsConfig::setAlpha, "Alpha setting")
+        .def_property("UseList", &GrubbsConfig::getUseList,&GrubbsConfig::setUseList,"Use List Output, True for list, False for dict")
+        .def_property("UseId", &GrubbsConfig::getUseId,&GrubbsConfig::setUseId,"Use ID Field, True for ID, False for no ID")
         .def("runGrubbs", &GrubbsConfig::runGrubbs, "Return standardised deviate of each data point using Grubb's test");
 
     py::class_<NoOutlierConfig>(m, "NoOutlierConfig")
         .def(py::init<>())
+        .def_property("UseList", &NoOutlierConfig::getUseList,&NoOutlierConfig::setUseList,"Use List Output, True for list, False for dict")
+        .def_property("UseId", &NoOutlierConfig::getUseId,&NoOutlierConfig::setUseId,"Use ID Field, True for ID, False for no ID")
         .def("runNoOutlier", &NoOutlierConfig::runNoOutlier, "Returns standardised deviate of each data point");
 }

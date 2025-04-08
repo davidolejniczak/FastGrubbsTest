@@ -1,4 +1,4 @@
-#include "mainFunctions.h"
+#include "mainFunctions.hpp"
 #include <iostream>
 #include <cstdio>
 #include <cstddef>

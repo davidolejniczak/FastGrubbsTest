@@ -5,6 +5,7 @@ Calculates the the z-score of each data point without including outliers in the 
 Providing z-scores for all data points including outliers while having the z-score based only data points that are not outliers
 
 The Grubbs test statistic determines what is an outlier
+The data set is assumed to be normal
 
 ## Installation
 
@@ -66,9 +67,9 @@ pip install FastGrubbsTest
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License
 
 ## Author
 
-David Olejniczak (david.olejniczak@icloud.com)
+David Olejniczak
 
