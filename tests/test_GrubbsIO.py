@@ -4,20 +4,8 @@ from GrubbsTest import run_Grubbs, Grubbs
 class TestGrubbsIO(unittest.TestCase):
     def setUp(self):
         self.list_data = [85, 4, 5, 3, 2]
-        self.dict_data = {
-            'a': 85,
-            'b': 4,
-            'c': 5,
-            'd': 3,
-            'e': 2
-        }
-        self.list_data_with_id = [
-            ['a', 85],
-            ['b', 4],
-            ['c', 5],
-            ['d', 3],
-            ['e', 2]
-        ]
+        self.dict_data = {'a': 85,'b': 4,'c': 5,'d': 3,'e': 2}
+        self.list_data_with_id = [['a', 85],['b', 4],['c', 5],['d', 3],['e', 2]]
 
     def test_list_input(self):
         result = run_Grubbs(self.list_data)
