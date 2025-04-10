@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-find_package(pybind11 CONFIG REQUIRED QUIET)
+find_package(pybind11 CONFIG REQUIRED)
 find_package(Boost REQUIRED)
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/GrubbsTest)

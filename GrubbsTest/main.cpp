@@ -5,6 +5,7 @@
 #include <pybind11/pybind11.h> 
 #include <pybind11/stl.h>
 #include <stddef.h>
+#include <memory>
 
 namespace py = pybind11;
 
@@ -155,37 +156,24 @@ public:
         }
 
         std::size_t size = values.size();
-        double* valuesArray = (double*)std::malloc(size * sizeof(double));
-        double* zscores = (double*)std::malloc(size * sizeof(double));
-
-        if (!valuesArray || !zscores) {
-            std::cerr << "Error: Failed to allocate memory for Grubbs" << std::endl;
-            if (valuesArray) std::free(valuesArray);
-            if (zscores) std::free(zscores);
-            return py::none();
-        }
+        std::shared_ptr<double[]> valuesArray(new double[size]);
+        std::shared_ptr<double[]> zscores(new double[size]);
 
         for (std::size_t i = 0; i < size; i++) {
             valuesArray[i] = values[i];
         }
 
-        double* finalValues = nullptr;
+        std::shared_ptr<double[]> finalValues = nullptr;
+
         std::size_t finalSize = 0;
-        int status = performGrubbs(valuesArray, size, &finalValues, &finalSize, zscores, alpha);
+        int status = performGrubbs(valuesArray, size, finalValues, &finalSize, zscores, alpha);
 
         if (status != 0) {
-            std::free(valuesArray);
-            std::free(zscores);
-            if (finalValues) std::free(finalValues);
             return py::none();
         }
 
-        std::vector<double> zscoreVector(zscores, zscores + size);
+        std::vector<double> zscoreVector(zscores.get(), zscores.get() + size); //can maybe change to span
         py::object result = formatOutput(ids, values, zscoreVector);
-
-        std::free(valuesArray);
-        std::free(zscores);
-        if (finalValues) std::free(finalValues);
 
         return result;
     }
@@ -214,15 +202,8 @@ public:
         }
 
         std::size_t size = values.size();
-        double* valuesArray = (double*)std::malloc(size * sizeof(double));
-        double* zscores = (double*)std::malloc(size * sizeof(double));
-
-        if (!valuesArray || !zscores) {
-            std::cerr << "Error: Failed to allocate memory for noOutlier" << std::endl;
-            if (valuesArray) std::free(valuesArray);
-            if (zscores) std::free(zscores);
-            return py::none();
-        }
+        std::shared_ptr<double[]> valuesArray(new double[size]);
+        std::shared_ptr<double[]> zscores(new double[size]); 
 
         for (std::size_t i = 0; i < size; i++) {
             valuesArray[i] = values[i];
@@ -231,16 +212,11 @@ public:
         int status = performNoOutlier(valuesArray, size, zscores);
 
         if (status != 0) {
-            std::free(valuesArray);
-            std::free(zscores);
             return py::none();
         }
 
-        std::vector<double> zscoreVector(zscores, zscores + size);
+        std::vector<double> zscoreVector(zscores.get(), zscores.get() + size); //can maybe change to span 
         py::object result = formatOutput(ids, values, zscoreVector);
-
-        std::free(valuesArray);
-        std::free(zscores);
 
         return result;
     }
