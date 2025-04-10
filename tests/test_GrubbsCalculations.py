@@ -1,6 +1,9 @@
 import unittest
 from GrubbsTest import run_Grubbs
-import numpy as np
+
+def find_max_abs_index(values):
+    """Find the index of the maximum absolute value in a list."""
+    return max(range(len(values)), key=lambda i: abs(values[i]))
 
 class TestGrubbsAlpha(unittest.TestCase):
     def setUp(self):
@@ -11,7 +14,7 @@ class TestGrubbsAlpha(unittest.TestCase):
         result = run_Grubbs(self.outlier_data, alpha=0.05)
         self.assertEqual(len(result), len(self.outlier_data))
         z_scores = [item[1] for item in result]
-        max_abs_zscore_idx = np.argmax(np.abs(z_scores))
+        max_abs_zscore_idx = find_max_abs_index(z_scores)
         self.assertEqual(self.outlier_data[max_abs_zscore_idx], 50)
         self.assertGreater(abs(z_scores[max_abs_zscore_idx]), 2.0)
 
@@ -19,7 +22,7 @@ class TestGrubbsAlpha(unittest.TestCase):
         result = run_Grubbs(self.outlier_data, alpha=0.01)
         self.assertEqual(len(result), len(self.outlier_data))
         z_scores = [item[1] for item in result]
-        max_abs_zscore_idx = np.argmax(np.abs(z_scores))
+        max_abs_zscore_idx = find_max_abs_index(z_scores)
         self.assertEqual(self.outlier_data[max_abs_zscore_idx], 50)
         self.assertGreater(abs(z_scores[max_abs_zscore_idx]), 2.5)
 

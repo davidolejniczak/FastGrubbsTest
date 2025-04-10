@@ -10,7 +10,7 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "FastGrubbsTest"
+name = "GrubbsTest"
 version = "0.0.1"
 description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
