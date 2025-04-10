@@ -2,7 +2,6 @@ import unittest
 from GrubbsTest import run_Grubbs
 
 def find_max_abs_index(values):
-    """Find the index of the maximum absolute value in a list."""
     return max(range(len(values)), key=lambda i: abs(values[i]))
 
 class TestGrubbsAlpha(unittest.TestCase):
