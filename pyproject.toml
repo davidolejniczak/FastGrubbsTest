@@ -10,7 +10,7 @@ requires = [
 build-backend = "scikit_build_core.build"
 
 [project]
-name = "GrubbsTest"
+name = "FastGrubbsTest"
 version = "0.0.1"
 description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
@@ -21,9 +21,10 @@ authors = [
 license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
+    "OS Independent :: False", 
+    "OS::Linux",
     "License :: OSI Approved :: MIT License",
-    "Topic :: Scientific/Engineering :: Mathematics",
-    "Topic :: Scientific/Engineering :: Statistics"
+    "Topic :: Scientific/Engineering :: Mathematics"
 ]
 dependencies = ["pybind11>=2.6.0"]
 
