@@ -14,7 +14,7 @@ name = "GrubbsTest"
 version = "0.0.1"
 description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 authors = [
     {name = "David Olejniczak", email = "david.olejniczak@icloud.com"}
 ]
@@ -28,8 +28,8 @@ classifiers = [
 dependencies = ["pybind11>=2.6.0"]
 
 [project.urls]
-Homepage = "https://github.com/davidolejniczak/IterativeJackKnife"
-"Bug Tracker" = "https://github.com/davidolejniczak/IterativeJackKnife/issues"
+Homepage = "https://github.com/davidolejniczak/FastGrubbsTest"
+"Bug Tracker" = "https://github.com/davidolejniczak/FastGrubbsTest/issues"
 
 [tool.scikit-build]
 wheel.expand-macos-universal-tags = true
