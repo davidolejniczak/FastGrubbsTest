@@ -1,11 +1,17 @@
 # GrubbsTest 
 
-Calculates the the z-score of each data point without including outliers in the mean and standard deviation calculation.
+High speed Grubbs Test used to calculate the the z-score data points in a data set.
 
-Providing z-scores for all data points including outliers while having the z-score based only data points that are not outliers
+The reason I created this was to have an fast alternate to the major python libaries. 
 
-The Grubbs test statistic determines what is an outlier
-The data set is assumed to be normal
+### Implentation Specifics   
+The Grubbs test statistic determines what is an outlier. 
+
+The final mean and standard deviation is calculated without including the outliers in the dataset. 
+
+Data set is assumed to be normal. 
+
+This is a Linux only package. 
 
 ## Installation
 
@@ -19,7 +25,7 @@ Before installing please install the following:
 You can install the package directly from PyPI:
 
 ```bash
-pip install FastGrubbsTest
+pip install grubbstest
 ```
 
 ## Usage
