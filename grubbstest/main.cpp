@@ -222,7 +222,7 @@ public:
     }
 };
 
-PYBIND11_MODULE(grubbstest, m) {
+PYBIND11_MODULE(_grubbstest_impl, m) {
     m.doc() = "Fast Grubbs Test.";
 
     py::class_<GrubbsConfig>(m, "GrubbsConfig")
