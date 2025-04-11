@@ -1,5 +1,5 @@
 import unittest
-from GrubbsTest import run_Grubbs
+from grubbstest import run_Grubbs
 
 def find_max_abs_index(values):
     return max(range(len(values)), key=lambda i: abs(values[i]))

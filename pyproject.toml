@@ -3,15 +3,13 @@ requires = [
     "scikit-build-core>=0.4.3",
     "wheel",
     "setuptools>=42",
-    "cmake>=3.18",
-    "ninja",
     "pybind11>=2.13.0",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "grubbstest"
-version = "0.0.1"
+version = "0.0.2"
 description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
 requires-python = ">=3.8"
@@ -32,15 +30,4 @@ Homepage = "https://github.com/davidolejniczak/FastGrubbsTest"
 "Bug Tracker" = "https://github.com/davidolejniczak/FastGrubbsTest/issues"
 
 [tool.scikit-build]
-wheel.expand-macos-universal-tags = true
-cmake.build-type = "Release"
-cmake.verbose = true
-minimum-version = "0.4.0"
-
-install.components = ["python"]
-wheel.packages = ["GrubbsTest"]
-
-[tool.scikit-build.cmake.define]
-USE_PYTHON_INCLUDE_DIR = "ON"
-
-CMAKE_CXX_STANDARD = "11"
+wheel.packages = ["grubbstest"]

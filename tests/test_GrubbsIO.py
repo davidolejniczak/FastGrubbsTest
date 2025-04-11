@@ -1,5 +1,5 @@
 import unittest
-from GrubbsTest import run_Grubbs, Grubbs
+from grubbstest import run_Grubbs, Grubbs
 
 class TestGrubbsIO(unittest.TestCase):
     def setUp(self):
