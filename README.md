@@ -1,17 +1,11 @@
 # GrubbsTest 
 
-High speed Grubbs Test used to calculate the the z-score data points in a data set.
-
-The reason I created this was to have an fast alternate to the major python libaries. 
+High speed Grubbs Test used to calculate the the z-score data points in a data set. The reason I created this was to have an fast alternate to the major python libaries. 
 
 ### Implentation Specifics   
-The Grubbs test statistic determines what is an outlier. 
+- The Grubbs test statistic determines what is an outlier. The final mean and standard deviation is calculated without including the outliers in the dataset. The data set is assumed to be normal. 
 
-The final mean and standard deviation is calculated without including the outliers in the dataset. 
-
-Data set is assumed to be normal. 
-
-This is a Linux only package. 
+- This is a Linux only package. 
 
 ## Installing GrubbsTest
 
