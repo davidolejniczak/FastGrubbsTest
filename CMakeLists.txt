@@ -16,3 +16,5 @@ target_include_directories(grubbstest PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/grubbstest
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
 )
+
+set_target_properties(grubbstest PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/grubbstest)

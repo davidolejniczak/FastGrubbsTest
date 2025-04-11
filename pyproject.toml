@@ -9,7 +9,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "grubbstest"
-version = "0.0.2"
+version = "0.0.3"
 description = "A python packege to perform Grubbs test quickly" 
 readme = "README.md"
 requires-python = ">=3.8"
@@ -23,7 +23,7 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
     "Topic :: Scientific/Engineering :: Mathematics"
 ]
-dependencies = ["pybind11>=2.6.0"]
+dependencies = ["pybind11>=2.13.0"]
 
 [project.urls]
 Homepage = "https://github.com/davidolejniczak/FastGrubbsTest"
