@@ -9,23 +9,23 @@ find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(Boost REQUIRED)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GrubbsTest)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/GrubbsTest)
 
 add_library(GrubbsTest SHARED 
-    src/GrubbsTest/mainFunctions.cpp
+    GrubbsTest/mainFunctions.cpp
 )
 
 pybind11_add_module(main MODULE
-    src/GrubbsTest/main.cpp
+    GrubbsTest/main.cpp
 )
 
 target_include_directories(GrubbsTest 
     PRIVATE ${pybind11_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/GrubbsTest
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/GrubbsTest
 )
 
 target_include_directories(main PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/GrubbsTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/GrubbsTest
     ${Python3_INCLUDE_DIRS}
     ${pybind11_INCLUDE_DIRS}
     ${Boost_INCLUDE_DIRS}
@@ -38,5 +38,5 @@ target_link_libraries(main PRIVATE
 )
 
 set_target_properties(main PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/GrubbsTest
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/GrubbsTest
 )
