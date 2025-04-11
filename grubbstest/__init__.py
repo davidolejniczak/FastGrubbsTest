@@ -1,4 +1,4 @@
-from grubbstest import NoOutlierConfig, GrubbsConfig
+from .grubbstest import NoOutlierConfig, GrubbsConfig
 
 __version__ = "0.0.2"
 
