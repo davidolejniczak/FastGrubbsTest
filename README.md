@@ -13,14 +13,7 @@ Data set is assumed to be normal.
 
 This is a Linux only package. 
 
-## Installation
-
-### Prerequisites
-
-Before installing please install the following:
-- Python 3.7 or higher
-
-### Installing GrubbsTest
+## Installing GrubbsTest
 
 You can install the package directly from PyPI:
 
