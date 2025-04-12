@@ -1,16 +1,20 @@
 # GrubbsTest 
 
-High speed Grubbs Test used to calculate the the z-score data points in a data set. The reason I created this was to have an fast alternate to the major python libaries. 
+High speed Grubbs Test used to calculate the the z-score data points in a data set. The reason I created this was to learn about c++ and python integration and have an fast alternate to the major python libaries. 
 
 ### Implentation Specifics   
 - The Grubbs test statistic determines what is an outlier. The final mean and standard deviation is calculated without including the outliers in the dataset. The data set is assumed to be normal. 
 
-- This is a Linux only package. 
+- This is a Linux only package.  
 
 ## Installing GrubbsTest
 
-You can install the package directly from PyPI:
+A valid c++ complier and cmake is needed to be installed to run the package.
+```bash 
+sudo apt install cmake g++
+```
 
+You can install the package directly from PyPI:
 ```bash
 pip install grubbstest
 ```
