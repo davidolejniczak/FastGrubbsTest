@@ -8,8 +8,8 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "grubbstest"
-version = "0.0.9"
-description = "A python packege to perform Grubbs test quickly" 
+version = "0.0.1"
+description = "Fast Grubbs' test implementation with C++ bindings." 
 readme = "README.md"
 requires-python = ">=3.8"
 authors = [

@@ -1,6 +1,6 @@
 from ._grubbstest_impl import NoOutlierConfig, GrubbsConfig
 
-__version__ = "0.0.9"
+__version__ = "0.0.1"
 
 class NoOutlier:
     def __init__(self, useList=True, useID=False):
