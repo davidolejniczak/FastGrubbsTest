@@ -7,6 +7,16 @@ High speed Grubbs Test used to calculate the the z-score data points in a data s
 
 - This is a Linux only package.  
 
+### Performance 
+
+To measure the speed of the program I ran it 30 times and averaged out the runtime for each data set. The data sets have 1k, 10k, and 100k data points respectively. The code and data sets are found in the ```Timing``` folder. 
+
+Elasped average time for 1k: 0.0010605255762736003 seconds
+Elasped average time for 10k: 0.059967414538065596 seconds
+Elasped average time for 100k: 5.762672845522562 seconds
+
+These results show the steller preformance of the code demonstrating that the c++  calculations work fast and well. However when we increase the dataset dramatically the preformance drops off significantly as expected.
+
 ## Installing GrubbsTest
 
 A valid c++ complier and cmake is needed to be installed to run the package.
@@ -18,7 +28,6 @@ You can install the package directly from PyPI:
 ```bash
 pip install grubbstest
 ```
-
 
 ## Usage
 ### Functions
