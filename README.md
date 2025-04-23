@@ -11,11 +11,11 @@ High speed Grubbs Test used to calculate the the z-score data points in a data s
 
 To measure the speed of the program I ran it 30 times and averaged out the runtime for each data set. The data sets have 1k, 10k, and 100k data points respectively. The code and data sets are found in the ```Timing``` folder. 
 
-Elasped average time for 1k: 0.012052615483601889 seconds
-Elasped average time for 10k: 0.6285494168599447 seconds
-Elasped average time for 100k: 59.474828481674194 seconds
+- Elasped average time for 1k: 0.012052615483601889 seconds
+- Elasped average time for 10k: 0.6285494168599447 seconds
+- Elasped average time for 100k: 59.474828481674194 seconds
 
-These results show the steller preformance of the code demonstrating that the c++  calculations work fast and well. However when we increase the dataset dramatically the preformance drops off significantly as expected.
+These results show the steller preformance of the code demonstrating that the c++ calculations work fast and well. However when we increase the dataset dramatically the preformance drops off significantly as expected.
 
 ## Installing GrubbsTest
 
