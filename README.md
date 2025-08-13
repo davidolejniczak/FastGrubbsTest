@@ -5,8 +5,6 @@ High speed Grubbs Test used to calculate the the z-score data points in a data s
 ### Implentation Specifics   
 - The Grubbs test statistic determines what is an outlier. The final mean and standard deviation is calculated without including the outliers in the dataset. The data set is assumed to be normal. 
 
-- This is a Linux only package.  
-
 ### Performance 
 
 ## Installing GrubbsTest
