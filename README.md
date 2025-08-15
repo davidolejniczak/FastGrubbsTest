@@ -9,7 +9,6 @@ High speed Grubbs Test used to calculate the the z-score data points in a data s
 
 ## Installing GrubbsTest
 
-A valid c++ complier and cmake is needed to be installed to run the package.
 ```bash 
 sudo apt install cmake g++
 ```
@@ -65,8 +64,3 @@ pip install grubbstest
 ## License
 
 This project is licensed under the MIT License
-
-## Author
-
-David Olejniczak
-
