@@ -1,4 +1,4 @@
-# GrubbsTest 
+# Stat Grubb
 
 High speed Grubbs Test used to calculate the the z-score data points in a data set. I created this to learn about c++ and python integration and to have an fast alternate to the major python libaries. You can view the package on pypi [here](https://pypi.org/project/grubbstest/). 
 
