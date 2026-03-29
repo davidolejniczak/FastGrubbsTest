@@ -1,21 +1,23 @@
-cmake_minimum_required(VERSION 3.18)
-project(grubbstest_cpp LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15...3.27)
+project(grubbstest)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF) 
+if (CMAKE_VERSION VERSION_LESS 3.18)
+    set(DEV_MODULE Development)
+else()
+    set(DEV_MODULE Development.Module)
+endif() 
 
-find_package(pybind11 CONFIG REQUIRED)
+find_package(Python 3.9 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
 
-pybind11_add_module(_grubbstest_impl
-    grubbstest/main.cpp
-    grubbstest/mainFunctions.cpp
-)
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
 
-target_include_directories(_grubbstest_impl PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/grubbstest
-    ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-)
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
+find_package(nanobind CONFIG REQUIRED)
 
-set_target_properties(_grubbstest_impl PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/grubbstest)
-install(TARGETS _grubbstest_impl DESTINATION grubbstest)
+nanobind_add_module(fastgrubbstest grubbstest/main.cpp)
