@@ -5,7 +5,7 @@ if (CMAKE_VERSION VERSION_LESS 3.18)
     set(DEV_MODULE Development)
 else()
     set(DEV_MODULE Development.Module)
-endif() 
+endif()
 
 find_package(Python 3.9 COMPONENTS Interpreter ${DEV_MODULE} REQUIRED)
 
@@ -20,4 +20,12 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
 find_package(nanobind CONFIG REQUIRED)
 
-nanobind_add_module(fastgrubbstest grubbstest/main.cpp)
+nanobind_add_module(fastgrubbstest
+    grubbstest/main.cpp
+    helperfuncs/mainFunctions.cpp
+)
+
+target_include_directories(fastgrubbstest PRIVATE
+    helperfuncs
+    third_party
+)
