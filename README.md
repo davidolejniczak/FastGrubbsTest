@@ -26,7 +26,7 @@ Because no points are removed, outliers pull the mean and standard deviation tow
 
 ### Performance
 
-Benchmarked against an equivalent pure-Python/NumPy/SciPy implementation (median of 10 runs):
+Benchmarked against an equivalent pure-Python/NumPy/SciPy implementation:
 
 | Dataset | `run_Grubbs` speedup | `run_NoOutlier` speedup |
 |---------|---------------------|------------------------|

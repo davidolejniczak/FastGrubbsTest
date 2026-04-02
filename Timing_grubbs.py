@@ -12,10 +12,6 @@ sys.path.insert(0, "build")
 import fastgrubbstest as cpp
 
 
-# ---------------------------------------------------------------------------
-# Pure-Python Grubbs (same algorithm as the C++ version)
-# ---------------------------------------------------------------------------
-
 def python_grubbs(data: dict, alpha: float = 0.05) -> dict:
     keys = list(data.keys())
     values = np.array(list(data.values()), dtype=np.float64)
@@ -54,10 +50,6 @@ def python_no_outlier(data: dict) -> dict:
     return {k: [float(v), float(z)] for k, v, z in zip(keys, values, zscores)}
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def load(path: str) -> dict:
     with open(path) as f:
         return ast.literal_eval(f.read())
@@ -80,12 +72,7 @@ def report(label: str, py_s: float, cpp_s: float) -> None:
     print(f"  {'C++':>8}  {cpp_s * 1000:8.3f} ms")
     print(f"  {'Speedup':>8}  {speedup:.1f}x")
 
-
-# ---------------------------------------------------------------------------
-# Main
-# ---------------------------------------------------------------------------
-
-RUNS = 10
+RUNS = 1
 ALPHA = 0.05
 DATASETS = [
     ("1k",   "Timing/data1k.txt"),
