@@ -38,7 +38,7 @@ The large gains in `run_Grubbs` come from O(1) outlier removal (swap-to-end) and
 
 ## Installing GrubbsTest
 
-> **macOS only** (Intel and Apple Silicon)
+> **macOS only** (Apple Silicon)
 
 ```bash
 pip install grubbstest

@@ -18,7 +18,7 @@ license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: MacOS",
+    "Operating System :: MacOS :: MacOS X",
     "Topic :: Scientific/Engineering :: Mathematics"
 ]
 dependencies = []
