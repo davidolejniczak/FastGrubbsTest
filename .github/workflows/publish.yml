@@ -5,6 +5,9 @@ on:
     tags:
       - "v*"   # triggers on version tags like v1.0.0
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build_wheels:
     name: Build macOS wheels

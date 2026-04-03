@@ -29,3 +29,5 @@ target_include_directories(fastgrubbstest PRIVATE
     helperfuncs
     third_party
 )
+
+install(TARGETS fastgrubbstest LIBRARY DESTINATION grubbstest)
