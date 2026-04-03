@@ -1,0 +1,43 @@
+name: Build and publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"   # triggers on version tags like v1.0.0
+
+jobs:
+  build_wheels:
+    name: Build macOS wheels
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+          CIBW_ARCHS_MACOS: "x86_64 arm64"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheels-macos
+          path: ./wheelhouse/*.whl
+
+  upload_pypi:
+    name: Upload to TestPyPI
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    environment: testpypi
+    permissions:
+      id-token: write   # required for trusted publishing
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: wheels-macos
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

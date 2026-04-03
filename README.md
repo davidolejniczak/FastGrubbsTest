@@ -38,11 +38,8 @@ The large gains in `run_Grubbs` come from O(1) outlier removal (swap-to-end) and
 
 ## Installing GrubbsTest
 
-```bash 
-sudo apt install cmake g++
-```
+> **macOS only** (Intel and Apple Silicon)
 
-You can install the package directly from PyPI:
 ```bash
 pip install grubbstest
 ```

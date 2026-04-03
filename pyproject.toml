@@ -1,17 +1,16 @@
 [build-system]
 requires = [
     "scikit-build-core>=0.4.3",
-    "setuptools>=42",
-    "pybind11>=2.13.0",
+    "nanobind>=2.0.0",
 ]
 build-backend = "scikit_build_core.build"
 
 [project]
 name = "grubbstest"
-version = "0.0.1"
+version = "2.0.0"
 description = "Fast Grubbs' test implementation with C++ bindings." 
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     {name = "David Olejniczak", email = "david.olejniczak@icloud.com"}
 ]
@@ -19,10 +18,10 @@ license = {text = "MIT"}
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
     "Topic :: Scientific/Engineering :: Mathematics"
 ]
-dependencies = ["pybind11>=2.13.0"]
+dependencies = []
 
 [project.urls]
 Homepage = "https://github.com/davidolejniczak/FastGrubbsTest"
