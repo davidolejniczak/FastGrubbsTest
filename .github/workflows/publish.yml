@@ -3,7 +3,7 @@ name: Build and publish to PyPI
 on:
   push:
     tags:
-      - "v*"   # triggers on version tags like v1.0.0
+      - "v*" 
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -29,12 +29,12 @@ jobs:
           path: ./wheelhouse/*.whl
 
   upload_pypi:
-    name: Upload to TestPyPI
+    name: Upload to PyPI
     needs: build_wheels
     runs-on: ubuntu-latest
-    environment: testpypi
+    environment: pypi
     permissions:
-      id-token: write   # required for trusted publishing
+      id-token: write 
 
     steps:
       - uses: actions/download-artifact@v4
@@ -43,5 +43,3 @@ jobs:
           path: dist/
 
       - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
